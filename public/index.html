@@ -236,7 +236,7 @@
             </div>
             <div id="messages-container"></div>
             <div class="input-area">
-                <input type="password" id="pass" placeholder="••••••••" onkeypress="if(event.key === 'Enter') login()">
+                 <input type="text" id="globalInput" placeholder="Type a message..." onkeypress="handleEnter(event)">
                 <button class="btn-primary" style="width:auto; padding:0 25px; margin:0;" onclick="sendGlobal()">Send</button>
             </div>
         </div>
