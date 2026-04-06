@@ -1,382 +1,657 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
     <title>Home Messenger Pro | Professional</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#ff3b3b">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#ff3b3b" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
     <script src="/socket.io/socket.io.js"></script>
     <style>
-        /* ... (Keep your existing CSS here) ... */
-        :root {
-            --bg-main: #0f1113;
-            --bg-card: #1a1d21;
-            --bg-chat: #14171a;
-            --text-main: #ffffff;
-            --text-muted: #9ba3af;
-            --accent: #ff3b3b;
-            --border: #2f3336;
-            --input-bg: #202327;
-            --success: #00875f;
-        }
+      /* ... (Keep your existing CSS here) ... */
+      :root {
+        --bg-main: #0f1113;
+        --bg-card: #1a1d21;
+        --bg-chat: #14171a;
+        --text-main: #ffffff;
+        --text-muted: #9ba3af;
+        --accent: #ff3b3b;
+        --border: #2f3336;
+        --input-bg: #202327;
+        --success: #00875f;
+      }
 
-        [data-theme="light"] {
-            --bg-main: #f3f4f6;
-            --bg-card: #ffffff;
-            --bg-chat: #ffffff;
-            --text-main: #111827;
-            --text-muted: #6b7280;
-            --accent: #ff3b3b;
-            --border: #e5e7eb;
-            --input-bg: #f9fafb;
-        }
+      [data-theme="light"] {
+        --bg-main: #f3f4f6;
+        --bg-card: #ffffff;
+        --bg-chat: #ffffff;
+        --text-main: #111827;
+        --text-muted: #6b7280;
+        --accent: #ff3b3b;
+        --border: #e5e7eb;
+        --input-bg: #f9fafb;
+      }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { height: 100dvh; margin: 0; padding: 0; overflow: hidden; transition: background 0.3s ease; }
-        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-main); color: var(--text-main); }
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html,
+      body {
+        height: 100dvh;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        transition: background 0.3s ease;
+      }
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
+        background: var(--bg-main);
+        color: var(--text-main);
+      }
 
-        .hidden { display: none !important; }
+      .hidden {
+        display: none !important;
+      }
 
-        #login-install-banner {
-            display: none;
-            background: var(--input-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 20px;
-            align-items: center;
-            gap: 12px;
-            text-align: left;
-            animation: slideDown 0.5s ease;
+      #login-install-banner {
+        display: none;
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 12px;
+        margin-bottom: 20px;
+        align-items: center;
+        gap: 12px;
+        text-align: left;
+        animation: slideDown 0.5s ease;
+      }
+      @keyframes slideDown {
+        from {
+          transform: translateY(-10px);
+          opacity: 0;
         }
-        @keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        .app-icon-preview {
-            width: 40px; height: 40px; background: var(--accent); 
-            border-radius: 8px; display: flex; align-items: center; 
-            justify-content: center; font-weight: bold; font-size: 1.2rem;
+        to {
+          transform: translateY(0);
+          opacity: 1;
         }
-        .install-info { flex: 1; }
-        .install-info b { font-size: 0.85rem; display: block; }
-        .install-info span { font-size: 0.7rem; color: var(--text-muted); }
-        .btn-install-gui {
-            background: var(--success); color: white; border: none; 
-            padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; 
-            font-weight: 700; cursor: pointer;
-        }
+      }
 
-        #login-screen { 
-            height: 100dvh; display: flex; align-items: center; justify-content: center; 
-            background: linear-gradient(135deg, var(--bg-main) 0%, #1a0505 100%); 
-        }
-        .login-card { 
-            background: var(--bg-card); padding: 40px; border-radius: 24px; 
-            border: 1px solid var(--border); box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            width: 90%; max-width: 400px; text-align: center;
-        }
+      .app-icon-preview {
+        width: 40px;
+        height: 40px;
+        background: var(--accent);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+      .install-info {
+        flex: 1;
+      }
+      .install-info b {
+        font-size: 0.85rem;
+        display: block;
+      }
+      .install-info span {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+      }
+      .btn-install-gui {
+        background: var(--success);
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
 
-        .input-group { text-align: left; margin-bottom: 15px; }
-        label { font-size: 0.8rem; color: var(--text-muted); margin-left: 5px; }
-        
-        input { 
-            padding: 14px; margin-top: 5px; width: 100%; border: 1px solid var(--border); 
-            border-radius: 12px; background: var(--input-bg); color: var(--text-main); 
-            font-size: 16px; transition: 0.2s;
-        }
-        input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.2); }
+      #login-screen {
+        height: 100dvh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--bg-main) 0%, #1a0505 100%);
+      }
+      .login-card {
+        background: var(--bg-card);
+        padding: 40px;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+      }
 
-        .btn-primary { 
-            padding: 14px; width: 100%; background: var(--accent); color: white; 
-            border: none; border-radius: 12px; cursor: pointer; font-weight: 600; 
-            font-size: 1rem; margin-top: 10px; transition: 0.2s;
-        }
-        .btn-primary:active { transform: scale(0.98); }
+      .input-group {
+        text-align: left;
+        margin-bottom: 15px;
+      }
+      label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-left: 5px;
+      }
 
-        #home-screen { display: grid; grid-template-columns: 300px 1fr; height: 100dvh; width: 100%; }
-        
-        #sidebar { 
-            background: var(--bg-card); border-right: 1px solid var(--border); 
-            display: flex; flex-direction: column; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1001; padding: 20px;
-        }
+      input {
+        padding: 14px;
+        margin-top: 5px;
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--input-bg);
+        color: var(--text-main);
+        font-size: 16px;
+        transition: 0.2s;
+      }
+      input:focus {
+        border-color: var(--accent);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 59, 59, 0.2);
+      }
 
-        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        
-        .theme-toggle {
-            background: var(--input-bg); border: 1px solid var(--border);
-            color: var(--text-main); padding: 8px 12px; border-radius: 10px;
-            cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 8px;
-        }
+      .btn-primary {
+        padding: 14px;
+        width: 100%;
+        background: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-top: 10px;
+        transition: 0.2s;
+      }
+      .btn-primary:active {
+        transform: scale(0.98);
+      }
 
-        #chat-main { display: flex; flex-direction: column; background: var(--bg-chat); height: 100%; }
-        
-        .header-bar { 
-            padding: 18px 20px; background: var(--bg-card); border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-        }
+      #home-screen {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        height: 100dvh;
+        width: 100%;
+        overflow: hidden; /* Mahalaga ito para hindi mag-scroll ang buong page */
+      }
 
-        #messages-container { 
-            flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column;
-            scroll-behavior: smooth;
-        }
-        
-        .msg { margin-bottom: 16px; max-width: 75%; }
-        .msg-content { 
-            padding: 12px 16px; border-radius: 18px; line-height: 1.5; 
-            font-size: 0.95rem; position: relative;
-        }
-        .msg.me { align-self: flex-end; }
-        .msg.me .msg-content { background: var(--accent); color: white; border-bottom-right-radius: 4px; }
-        .msg.others .msg-content { background: var(--input-bg); color: var(--text-main); border-bottom-left-radius: 4px; border: 1px solid var(--border); }
-        .msg-info { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px; margin-left: 4px; }
+      #sidebar {
+        background: var(--bg-card);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1001;
+        padding: 20px;
+      }
 
-        .input-area { 
-            padding: 15px 20px; background: var(--bg-card); border-top: 1px solid var(--border);
-            display: flex; gap: 12px; padding-bottom: max(15px, env(safe-area-inset-bottom));
-        }
-        
-        @media (max-width: 768px) {
-            #home-screen { grid-template-columns: 1fr; }
-            #sidebar { 
-                position: fixed; left: -100%; top: 0; width: 85%; height: 100dvh; 
-                box-shadow: 20px 0 50px rgba(0,0,0,0.5);
-            }
-            #sidebar.active { left: 0; }
-            .close-sidebar { display: block !important; font-size: 28px; cursor: pointer; }
-        }
+      .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+      }
 
-        .menu-toggle { font-size: 24px; cursor: pointer; display: none; }
-        @media (max-width: 768px) { .menu-toggle { display: block; } }
+      .theme-toggle {
+        background: var(--input-bg);
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
 
-        .user-item { 
-            padding: 12px 15px; border-radius: 12px; cursor: pointer; 
-            margin-bottom: 5px; display: flex; align-items: center; gap: 10px;
-            transition: 0.2s;
+      #chat-main {
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-chat);
+        height: 100dvh; /* Force height sa viewport */
+        overflow: hidden;
+      }
+
+      .header-bar {
+        padding: 18px 20px;
+        background: var(--bg-card);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      #messages-container {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto; /* Dito lang lalabas ang scrollbar */
+        display: flex;
+        flex-direction: column;
+        scroll-behavior: smooth;
+        background: var(--bg-chat);
+      }
+
+      .msg {
+        margin-bottom: 16px;
+        max-width: 75%;
+      }
+      .msg-content {
+        padding: 12px 16px;
+        border-radius: 18px;
+        line-height: 1.5;
+        font-size: 0.95rem;
+        position: relative;
+      }
+      .msg.me {
+        align-self: flex-end;
+      }
+      .msg.me .msg-content {
+        background: var(--accent);
+        color: white;
+        border-bottom-right-radius: 4px;
+      }
+      .msg.others .msg-content {
+        background: var(--input-bg);
+        color: var(--text-main);
+        border-bottom-left-radius: 4px;
+        border: 1px solid var(--border);
+      }
+      .msg-info {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+        margin-left: 4px;
+      }
+
+      .input-area {
+        flex-shrink: 0; /* Bawal itong lumiit o lumaki */
+        padding: 15px 20px;
+        background: var(--bg-card);
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 12px;
+        padding-bottom: max(15px, env(safe-area-inset-bottom));
+      }
+
+      /* Pagsamahin ang dalawang media query mo sa isa para clean code */
+      @media (max-width: 768px) {
+        #home-screen {
+          grid-template-columns: 1fr;
         }
-        .user-item:hover { background: var(--input-bg); }
-        .status-dot { width: 10px; height: 10px; background: #10b981; border-radius: 50%; }
-
-        /* Register Toggle Button */
-        .auth-switch {
-            background: transparent; border: none; color: var(--text-muted);
-            font-size: 0.85rem; cursor: pointer; margin-top: 15px; text-decoration: underline;
+        #chat-main {
+          height: 100dvh;
         }
+        #sidebar {
+          position: fixed;
+          left: -100%;
+          top: 0;
+          width: 85%;
+          height: 100dvh;
+          box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+        }
+        #sidebar.active {
+          left: 0;
+        }
+        .close-sidebar {
+          display: block !important;
+          font-size: 28px;
+          cursor: pointer;
+        }
+        .menu-toggle {
+          display: block;
+        }
+      }
 
-        #auth-toggle {
-    cursor: pointer;
-    transition: color 0.2s;
-}
-#auth-toggle:hover {
-    color: #ffffff !important; /* Mag-u-glow pag hinover sa desktop */
-    text-decoration: underline;
-}
+      .user-item {
+        padding: 12px 15px;
+        border-radius: 12px;
+        cursor: pointer;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: 0.2s;
+      }
+      .user-item:hover {
+        background: var(--input-bg);
+      }
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        background: #10b981;
+        border-radius: 50%;
+      }
+
+      /* Register Toggle Button */
+      .auth-switch {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        cursor: pointer;
+        margin-top: 15px;
+        text-decoration: underline;
+      }
+
+      #auth-toggle {
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+      #auth-toggle:hover {
+        color: #ffffff !important; /* Mag-u-glow pag hinover sa desktop */
+        text-decoration: underline;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div id="login-screen">
-    <div class="login-card">
+      <div class="login-card">
         <div id="login-install-banner">
-            <div class="app-icon-preview">H</div>
-            <div class="install-info">
-                <b>Home Messenger Pro</b>
-                <span>Official Mobile App</span>
-            </div>
-            <button class="btn-install-gui" onclick="installPWA()">INSTALL</button>
+          <div class="app-icon-preview">H</div>
+          <div class="install-info">
+            <b>Home Messenger Pro</b>
+            <span>Official Mobile App</span>
+          </div>
+          <button class="btn-install-gui" onclick="installPWA()">
+            INSTALL
+          </button>
         </div>
 
-        <h1 id="auth-title" style="color:var(--accent); font-size: 1.8rem; margin-bottom: 5px;">HomeMsg</h1>
-        <p id="auth-desc" style="color:var(--text-muted); margin-bottom: 30px; font-size: 0.9rem;">Connect with your circle</p>
-        
-        <div class="input-group">
-            <label>Username</label>
-            <input type="text" id="user" placeholder="Enter username">
-        </div>
-        <div class="input-group">
-            <label>Password</label>
-            <input type="password" id="pass" placeholder="••••••••">
-        </div>
-        
-        <button id="auth-btn" class="btn-primary" onclick="login()">Sign In</button>
-        
-        <p style="margin-top: 20px; font-size: 0.85rem;">
-            <span id="toggle-text" style="color:var(--text-muted);">Don't have an account?</span>
-            <a href="javascript:void(0)" id="auth-toggle" onclick="toggleAuthMode()" style="color:var(--accent); text-decoration: none; font-weight: 600; margin-left: 5px;">Register here</a>
+        <h1
+          id="auth-title"
+          style="color: var(--accent); font-size: 1.8rem; margin-bottom: 5px"
+        >
+          HomeMsg
+        </h1>
+        <p
+          id="auth-desc"
+          style="
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+          "
+        >
+          Connect with your circle
         </p>
+
+        <div class="input-group">
+          <label>Username</label>
+          <input type="text" id="user" placeholder="Enter username" />
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="pass" placeholder="••••••••" />
+        </div>
+
+        <button id="auth-btn" class="btn-primary" onclick="login()">
+          Sign In
+        </button>
+
+        <p style="margin-top: 20px; font-size: 0.85rem">
+          <span id="toggle-text" style="color: var(--text-muted)"
+            >Don't have an account?</span
+          >
+          <a
+            href="javascript:void(0)"
+            id="auth-toggle"
+            onclick="toggleAuthMode()"
+            style="
+              color: var(--accent);
+              text-decoration: none;
+              font-weight: 600;
+              margin-left: 5px;
+            "
+            >Register here</a
+          >
+        </p>
+      </div>
     </div>
-</div>
 
     <div id="home-screen" class="hidden">
-        <div id="sidebar">
-            <div class="sidebar-header">
-                <h2 style="font-size: 1.2rem; margin:0;">Online</h2>
-                <span class="close-sidebar hidden" onclick="toggleSidebar()">×</span>
-            </div>
-            <button id="install-btn-sidebar" class="btn-primary" style="background:#ffc107; color:black; margin-bottom:20px; display:none;" onclick="installPWA()">📲 Get App</button>
-            <div id="online-list" style="flex:1; overflow-y:auto;"></div>
-            <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
-                <button class="theme-toggle" onclick="toggleTheme()">
-                    <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
-                </button>
-                <button onclick="logout()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); padding:10px; border-radius:10px; cursor:pointer;">Sign Out</button>
-            </div>
+      <div id="sidebar">
+        <div class="sidebar-header">
+          <h2 style="font-size: 1.2rem; margin: 0">Online</h2>
+          <span class="close-sidebar hidden" onclick="toggleSidebar()">×</span>
         </div>
+        <button
+          id="install-btn-sidebar"
+          class="btn-primary"
+          style="
+            background: #ffc107;
+            color: black;
+            margin-bottom: 20px;
+            display: none;
+          "
+          onclick="installPWA()"
+        >
+          📲 Get App
+        </button>
+        <div id="online-list" style="flex: 1; overflow-y: auto"></div>
+        <div
+          style="
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          "
+        >
+          <button class="theme-toggle" onclick="toggleTheme()">
+            <span id="theme-icon">🌙</span>
+            <span id="theme-text">Dark Mode</span>
+          </button>
+          <button
+            onclick="logout()"
+            style="
+              background: transparent;
+              border: 1px solid var(--border);
+              color: var(--text-muted);
+              padding: 10px;
+              border-radius: 10px;
+              cursor: pointer;
+            "
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
 
-        <div id="chat-main">
-            <div class="header-bar">
-                <div style="display:flex; align-items:center; gap:15px;">
-                    <span class="menu-toggle" onclick="toggleSidebar()">☰</span>
-                    <div>
-                        <div style="font-weight: 600;">Global Channel</div>
-                        <div style="font-size: 0.7rem; color: #10b981;">● Active Now</div>
-                    </div>
-                </div>
+      <div id="chat-main">
+        <div class="header-bar">
+          <div style="display: flex; align-items: center; gap: 15px">
+            <span class="menu-toggle" onclick="toggleSidebar()">☰</span>
+            <div>
+              <div style="font-weight: 600">Global Channel</div>
+              <div style="font-size: 0.7rem; color: #10b981">● Active Now</div>
             </div>
-            <div id="messages-container"></div>
-            <div class="input-area">
-    <input type="text" id="globalInput" placeholder="Type a message..." 
-           onkeypress="if(event.key === 'Enter') sendGlobal()" autocomplete="off">
-    
-    <button class="btn-primary" style="width:auto; padding:0 25px; margin:0;" onclick="sendGlobal()">Send</button>
-</div>
+          </div>
         </div>
+        <div id="messages-container"></div>
+        <div class="input-area">
+          <input
+            type="text"
+            id="globalInput"
+            placeholder="Type a message..."
+            onkeypress="if (event.key === 'Enter') sendGlobal();"
+            autocomplete="off"
+          />
+
+          <button
+            class="btn-primary"
+            style="width: auto; padding: 0 25px; margin: 0"
+            onclick="sendGlobal()"
+          >
+            Send
+          </button>
+        </div>
+      </div>
     </div>
 
     <script>
-        const socket = io();
-        let myName = "";
-        let isRegisterMode = false;
-        let deferredPrompt;
+      const socket = io();
+      let myName = "";
+      let isRegisterMode = false;
+      let deferredPrompt;
 
-        // --- 1. AUTH LOGIC ---
-        function toggleAuthMode() {
-            isRegisterMode = !isRegisterMode;
-            const title = document.getElementById('auth-title');
-            const desc = document.getElementById('auth-desc');
-            const btn = document.getElementById('auth-btn');
-            const toggle = document.getElementById('auth-toggle');
+      // --- 1. AUTH LOGIC ---
+      function toggleAuthMode() {
+        isRegisterMode = !isRegisterMode;
+        const title = document.getElementById("auth-title");
+        const desc = document.getElementById("auth-desc");
+        const btn = document.getElementById("auth-btn");
+        const toggle = document.getElementById("auth-toggle");
 
-            if (isRegisterMode) {
-                title.innerText = "Create Account";
-                desc.innerText = "Join the community today";
-                btn.innerText = "Register Now";
-                btn.onclick = register;
-                toggle.innerText = "Already have an account? Sign In.";
-            } else {
-                title.innerText = "HomeMsg";
-                desc.innerText = "Connect with your circle";
-                btn.innerText = "Sign In";
-                btn.onclick = login;
-                toggle.innerText = "Don't have an account? Register here.";
-            }
+        if (isRegisterMode) {
+          title.innerText = "Create Account";
+          desc.innerText = "Join the community today";
+          btn.innerText = "Register Now";
+          btn.onclick = register;
+          toggle.innerText = "Already have an account? Sign In.";
+        } else {
+          title.innerText = "HomeMsg";
+          desc.innerText = "Connect with your circle";
+          btn.innerText = "Sign In";
+          btn.onclick = login;
+          toggle.innerText = "Don't have an account? Register here.";
         }
+      }
 
-        function register() {
-            const user = document.getElementById('user').value;
-            const pass = document.getElementById('pass').value;
-            if(!user || !pass) return alert("Please fill in both fields.");
-            socket.emit('register', { user, pass });
-        }
+      function register() {
+        const user = document.getElementById("user").value;
+        const pass = document.getElementById("pass").value;
+        if (!user || !pass) return alert("Please fill in both fields.");
+        socket.emit("register", { user, pass });
+      }
 
-        function login() {
-            const user = document.getElementById('user').value;
-            const pass = document.getElementById('pass').value;
-            if(!user || !pass) return alert("Credentials required.");
-            socket.emit('login', { user, pass });
-        }
+      function login() {
+        const user = document.getElementById("user").value;
+        const pass = document.getElementById("pass").value;
+        if (!user || !pass) return alert("Credentials required.");
+        socket.emit("login", { user, pass });
+      }
 
-        socket.on('register-success', () => {
-            alert("Account created! You can now sign in.");
-            toggleAuthMode(); // Switch back to login
+      socket.on("register-success", () => {
+        alert("Account created! You can now sign in.");
+        toggleAuthMode(); // Switch back to login
+      });
+      socket.on("register-fail", (msg) => alert(msg));
+      socket.on("login-fail", (msg) => alert(msg));
+
+      socket.on("login-success", (name) => {
+        myName = name;
+        document.getElementById("login-screen").classList.add("hidden");
+        document.getElementById("home-screen").classList.remove("hidden");
+      });
+
+      // --- 2. PWA LOGIC ---
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js");
         });
-        socket.on('register-fail', (msg) => alert(msg));
-        socket.on('login-fail', (msg) => alert(msg));
+      }
 
-        socket.on('login-success', (name) => {
-            myName = name;
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('home-screen').classList.remove('hidden');
-        });
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const banner = document.getElementById("login-install-banner");
+        const sidebarBtn = document.getElementById("install-btn-sidebar");
+        if (banner) banner.style.display = "flex";
+        if (sidebarBtn) sidebarBtn.style.display = "block";
+      });
 
-        // --- 2. PWA LOGIC ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js');
-            });
+      async function installPWA() {
+        if (!deferredPrompt)
+          return alert(
+            "Hindi pa ready ang prompt. Gamitin ang Chrome menu > Install.",
+          );
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === "accepted") {
+          deferredPrompt = null;
+          document.getElementById("login-install-banner").style.display =
+            "none";
         }
+      }
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            const banner = document.getElementById('login-install-banner');
-            const sidebarBtn = document.getElementById('install-btn-sidebar');
-            if(banner) banner.style.display = 'flex';
-            if(sidebarBtn) sidebarBtn.style.display = 'block';
-        });
-
-        async function installPWA() {
-            if (!deferredPrompt) return alert("Hindi pa ready ang prompt. Gamitin ang Chrome menu > Install.");
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                deferredPrompt = null;
-                document.getElementById('login-install-banner').style.display = 'none';
-            }
+      // --- 3. CHAT ENGINE ---
+      function sendGlobal() {
+        const input = document.getElementById("globalInput");
+        if (input.value.trim()) {
+          socket.emit("global-msg", input.value);
+          input.value = "";
         }
+      }
 
-        // --- 3. CHAT ENGINE ---
-        function sendGlobal() {
-            const input = document.getElementById('globalInput');
-            if(input.value.trim()) {
-                socket.emit('global-msg', input.value);
-                input.value = "";
-            }
-        }
-
-        socket.on('global-msg', data => {
-            const container = document.getElementById('messages-container');
-            const isMe = data.user === myName;
-            container.innerHTML += `
-                <div class="msg ${isMe ? 'me' : 'others'}">
-                    <div class="msg-info">${isMe ? 'You' : data.user}</div>
+      socket.on("global-msg", (data) => {
+        const container = document.getElementById("messages-container");
+        const isMe = data.user === myName;
+        container.innerHTML += `
+                <div class="msg ${isMe ? "me" : "others"}">
+                    <div class="msg-info">${isMe ? "You" : data.user}</div>
                     <div class="msg-content">${data.text}</div>
                 </div>`;
-            container.scrollTop = container.scrollHeight;
-        });
+        container.scrollTop = container.scrollHeight;
+      });
 
-        socket.on('load-history', (history) => {
-            const container = document.getElementById('messages-container');
-            container.innerHTML = "";
-            history.forEach(data => {
-                const isMe = data.user === myName;
-                container.innerHTML += `
-                    <div class="msg ${isMe ? 'me' : 'others'}">
-                        <div class="msg-info">${isMe ? 'You' : data.user}</div>
+      socket.on("load-history", (history) => {
+        const container = document.getElementById("messages-container");
+        container.innerHTML = "";
+        history.forEach((data) => {
+          const isMe = data.user === myName;
+          container.innerHTML += `
+                    <div class="msg ${isMe ? "me" : "others"}">
+                        <div class="msg-info">${isMe ? "You" : data.user}</div>
                         <div class="msg-content">${data.text}</div>
                     </div>`;
-            });
-            container.scrollTop = container.scrollHeight;
         });
+        container.scrollTop = container.scrollHeight;
+      });
 
-        socket.on('update-users', list => {
-            const html = list.map(u => u !== myName ? `<div class="user-item"><div class="status-dot"></div> ${u}</div>` : '').join('');
-            document.getElementById('online-list').innerHTML = html || '<small>Just you for now.</small>';
-        });
+      socket.on("update-users", (list) => {
+        const html = list
+          .map((u) =>
+            u !== myName
+              ? `<div class="user-item"><div class="status-dot"></div> ${u}</div>`
+              : "",
+          )
+          .join("");
+        document.getElementById("online-list").innerHTML =
+          html || "<small>Just you for now.</small>";
+      });
 
-        // Theme & UI
-        function toggleTheme() {
-            const isDark = document.body.getAttribute('data-theme') !== 'light';
-            document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            document.getElementById('theme-icon').innerText = isDark ? '☀️' : '🌙';
-            localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        }
-        if(localStorage.getItem('theme') === 'light') toggleTheme();
-        
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
-        function handleEnter(e) { if (e.key === 'Enter') sendGlobal(); }
-        function logout() { window.location.reload(); }
+      // Theme & UI
+      function toggleTheme() {
+        const isDark = document.body.getAttribute("data-theme") !== "light";
+        document.body.setAttribute("data-theme", isDark ? "light" : "dark");
+        document.getElementById("theme-icon").innerText = isDark ? "☀️" : "🌙";
+        localStorage.setItem("theme", isDark ? "light" : "dark");
+      }
+      if (localStorage.getItem("theme") === "light") toggleTheme();
+
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("active");
+      }
+      function handleEnter(e) {
+        if (e.key === "Enter") sendGlobal();
+      }
+      function logout() {
+        window.location.reload();
+      }
     </script>
-</body>
+  </body>
 </html>
