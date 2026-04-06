@@ -1,5 +1,5 @@
 // public/sw.js
-const CACHE_NAME = 'homemsg-v2';
+const CACHE_NAME = 'homemsg-v3git add .';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
